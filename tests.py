@@ -1,0 +1,51 @@
+#!/usr/bin/env python
+"""
+Tests for keyedin package.
+"""
+
+import pitchdistribution as pd
+import unittest
+
+
+class TestPitchDistribution(unittest.TestCase):
+
+    def test_skip_interval_no_loop(self):
+        actual = pd.skip_interval('B', 'm3')
+        expected = 'D'
+        self.assertEqual(actual, expected)
+
+    def test_skip_interval_with_loop(self):
+        actual = pd.skip_interval('G#', 'P5')
+        expected = 'D#'
+        self.assertEqual(actual, expected)
+
+    def test_get_key_profile_sanity_check(self):
+        actual = pd.get_key_profile('A').to_array()
+        expected = pd.MAJOR_KEY_PROFILE
+        self.assertEqual(actual, expected)
+
+    def test_get_key_profile_with_loop(self):
+        actual = pd.get_key_profile('F').to_array()
+        expected = [0.13, 0.10, 0.06, 0.14, 0.03, 0.11, 0.03, 0.09, 0.16, 0.03, 0.09, 0.03]
+        self.assertEqual(actual, expected)
+
+    def test_pitch_distribution_sanity_check(self):
+        values = [1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1]
+        actual = pd.PitchDistribution(values).to_array()
+        expected = [.1, 0, .1, 0, .1, .1, .1, .1, .1, .1, .1, .1]
+        self.assertEqual(actual, expected)
+
+    def test_pitch_distribution_get_set_vals(self):
+        values = [1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1]
+        dist = pd.PitchDistribution()
+        for i in range(len(values)):
+            dist.set_val(pd.NOTES[i], values[i])
+        dist.normalize()
+        expected = [.1, 0, .1, 0, .1, .1, .1, .1, .1, .1, .1, .1]
+        for i in range(len(expected)):
+            actual = dist.get_val(pd.NOTES[i])
+            self.assertEqual(actual, expected[i])
+
+
+if __name__ == '__main__':
+    unittest.main()
