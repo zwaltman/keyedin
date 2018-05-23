@@ -66,6 +66,9 @@ class PitchDistribution(object):
         return 0.0
 
     def normalize(self):
+        """
+        Normalize distribution so that all entries sum to 1
+        """
         distribution_sum = sum(self.distribution.values())
         if distribution_sum != 0:
             for k in self.distribution.keys():

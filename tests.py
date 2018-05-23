@@ -4,6 +4,7 @@ Tests for keyedin package.
 """
 
 import pitchdistribution as pd
+import classifiers
 import unittest
 
 
@@ -45,6 +46,39 @@ class TestPitchDistribution(unittest.TestCase):
         for i in range(len(expected)):
             actual = dist.get_val(pd.NOTES[i])
             self.assertEqual(actual, expected[i])
+
+
+class TestKrumhanslSchmucklerClassifier(unittest.TestCase):
+
+    krumhansl_schmuckler = classifiers.KrumhanslSchmuckler()
+
+    def test_krumhansl_schmuckler_monotonic_distribution(self):
+        values = [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]
+        dist = pd.PitchDistribution(values)
+        actual = self.krumhansl_schmuckler.get_key(dist)
+        expected = 'E'
+        self.assertEqual(actual, expected)
+
+    def test_krumhansl_schmuckler_triad(self):
+        values = [0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0]
+        dist = pd.PitchDistribution(values)
+        actual = self.krumhansl_schmuckler.get_key(dist)
+        expected = 'C'
+        self.assertEqual(actual, expected)
+
+    def test_krumhansl_schmuckler_leading_tone(self):
+        values = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3]
+        dist = pd.PitchDistribution(values)
+        actual = self.krumhansl_schmuckler.get_key(dist)
+        expected = 'G#'
+        self.assertEqual(actual, expected)
+
+    def test_krumhansl_schmuckler_add_4_triad(self):
+        values = [2, 0, 0, 0, 3, 2, 0, 2, 0, 0, 0, 0]
+        dist = pd.PitchDistribution(values)
+        actual = self.krumhansl_schmuckler.get_key(dist)
+        expected = 'A'
+        self.assertEqual(actual, expected)
 
 
 if __name__ == '__main__':
