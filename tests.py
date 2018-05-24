@@ -81,5 +81,38 @@ class TestKrumhanslSchmucklerClassifier(unittest.TestCase):
         self.assertEqual(actual, expected)
 
 
+class TestNaiveBayesClassifier(unittest.TestCase):
+
+    naive_bayes = classifiers.NaiveBayes()
+
+    def test_naive_bayes_monotonic_distribution(self):
+        values = [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]
+        dist = pd.PitchDistribution(values)
+        actual = self.naive_bayes.get_key(dist)
+        expected = 'E'
+        self.assertEqual(actual, expected)
+
+    def test_naive_bayes_triad(self):
+        values = [0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0]
+        dist = pd.PitchDistribution(values)
+        actual = self.naive_bayes.get_key(dist)
+        expected = 'C'
+        self.assertEqual(actual, expected)
+
+    def test_naive_bayes_leading_tone(self):
+        values = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3]
+        dist = pd.PitchDistribution(values)
+        actual = self.naive_bayes.get_key(dist)
+        expected = 'G#'
+        self.assertEqual(actual, expected)
+
+    def test_naive_bayes_add_4_triad(self):
+        values = [2, 0, 0, 0, 3, 2, 0, 2, 0, 0, 0, 0]
+        dist = pd.PitchDistribution(values)
+        actual = self.naive_bayes.get_key(dist)
+        expected = 'A'
+        self.assertEqual(actual, expected)
+
+
 if __name__ == '__main__':
     unittest.main()

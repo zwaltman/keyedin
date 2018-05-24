@@ -7,12 +7,13 @@ import pitchdistribution as pd
 import numpy as np
 
 
-class KrumhanslSchmuckler(object):
+class Classifier(object):
     """
-    Classifier using the Krumhansl-Schmuckler key-finding algorithm.
+    Abstract class for classifiers PitchDistribution --> key (distributional key finders)
     """
     def __init__(self):
-        self.key_profiles = self.get_key_profiles()
+        if type(self) is Classifier:
+            raise Exception("Classifier is an abstract class and can't be directly instantiated")
 
     @staticmethod
     def get_key_profiles():
@@ -24,6 +25,20 @@ class KrumhanslSchmuckler(object):
             profiles[key] = pd.get_key_profile(key)
         return profiles
 
+    def get_key(self, dist):
+        """
+        Given PitchDistribution DIST, return classifier's guess for its key
+        """
+        raise NotImplementedError("Subclasses of Classifier must implement get_key method")
+
+
+class KrumhanslSchmuckler(Classifier):
+    """
+    Classifier using the Krumhansl-Schmuckler key-finding algorithm
+    """
+    def __init__(self):
+        self.key_profiles = self.get_key_profiles()
+
     def correlation(self, key, dist):
         """
         Given key KEY and pitch distribution DIST, return correlation coefficient of DIST and KEY's pitch profile
@@ -34,9 +49,41 @@ class KrumhanslSchmuckler(object):
 
     def get_key(self, dist):
         """
-        Given pitch distribution DIST, return the key whose pitch profile best matches it
+        Given PitchDistribution DIST, return the key whose typical pitch profile best matches it
         """
+        assert len(dist.distribution) == pd.NUM_NOTES, "Distribution must have %d notes, %d provided" % (pd.NUM_NOTES, len(dist.distribution))
         dist = dist.to_array()
-        assert len(dist) == pd.NUM_NOTES, "Distribution must have %d notes, %d provided" % (pd.NUM_NOTES, len(dist))
         correlations = [self.correlation(key, dist) for key in pd.NOTES]
         return pd.NOTES[correlations.index(max(correlations))]
+
+
+class NaiveBayes(Classifier):
+    """
+    Classifier using a Naive Bayes model with values of a pitch distribution as features
+    """
+    def __init__(self):
+        self.key_profiles = self.get_key_profiles()
+
+    def get_proportion_probability(self, key, note, prop):
+        """
+        Return probability of a PitchDistribution with true key KEY having value PROP for note NOTE
+        """
+        expected_proportion = self.key_profiles[key].get_val(note)
+        return 1 - (prop - expected_proportion)**2
+
+    def get_key_likelihood(self, key, dist):
+        """
+        Return probability proportional to that of PitchDistribution DIST given key KEY
+        """
+        likelihood = 1.0
+        for note in pd.NOTES:
+            likelihood *= self.get_proportion_probability(key, note, dist.get_val(note))
+        return likelihood
+
+    def get_key(self, dist):
+        """
+        Given PitchDistribution DIST, return the key which is most likely given Naive Bayes model
+        """
+        assert len(dist.distribution) == pd.NUM_NOTES, "Distribution must have %d notes, %d provided" % (pd.NUM_NOTES, len(dist.distribution))
+        likelihoods = [self.get_key_likelihood(key, dist) for key in pd.NOTES]
+        return pd.NOTES[likelihoods.index(max(likelihoods))]
