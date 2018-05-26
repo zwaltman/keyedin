@@ -3,11 +3,17 @@
 Class PitchDistribution represents proportion of musical sample made up of each note A, A#, B, ..., G, G#.
 """
 
+import audioprocessing as ap
+import numpy as np
+
+
 NOTES = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#']
 INTERVALS = ['P1', 'm2', 'M2', 'm3', 'M3', 'P4', 'd5', 'P5', 'm6', 'M6', 'm7', 'M7']
 NUM_NOTES = 12
-# 'Prototypical' pitch distribution for major key with tonic A, adapted by rotating for use with any major key.
+# 'Prototypical' pitch distributions [A, A#, B, ..., G#] for major, minor keys with tonic A,
+# adapted for use with other tonal centers by rotating.
 MAJOR_KEY_PROFILE = [0.16, 0.03, 0.09, 0.03, 0.13, 0.10, 0.06, 0.14, 0.03, 0.11, 0.03, 0.09]
+NATURAL_MINOR_KEY_PROFILE = [0.16, 0.03, 0.09, 0.13, 0.03, 0.10, 0.06, 0.14, 0.11, 0.03, 0.09, 0.03]
 
 
 def skip_interval(root, interval):
@@ -38,18 +44,38 @@ class PitchDistribution(object):
     """
     Distribution over pitch classes A, A#, ..., G, G# in the form of a map NOTES --> [0,1]
     """
-    def __init__(self, values=None):
+    def __init__(self, values_array=None):
         """
         Initializes empty distribution.
         """
         self.distribution = {}
-        if values:
-            assert len(values) == NUM_NOTES, "Distribution must have %d notes, %d provided" % (NUM_NOTES, len(values))
+        if values_array:
+            assert len(values_array) == NUM_NOTES, "Distribution must have %d notes, %d provided" % (NUM_NOTES, len(values_array))
             for i in range(NUM_NOTES):
                 note = NOTES[i]
-                val = values[i]
+                val = values_array[i]
                 self.set_val(note, val)
             self.normalize()
+
+    @classmethod
+    def from_filename(cls, filename):
+        """
+        Given path FILENAME to audio file, return its PitchDistribution
+        """
+        def chromagram_index_to_note(i):
+            """
+            Given row index in librosa chromagram, returns note it represents
+            """
+            return skip_interval('C', INTERVALS[i])
+
+        C = ap.chromagram_from_filename(filename)
+        dist = PitchDistribution()
+        single_note_reduction = C.argmax(axis=0)
+        for i in np.nditer(single_note_reduction):
+            note = chromagram_index_to_note(i)
+            dist.increment_val(note)
+        dist.normalize()
+        return dist
 
     def __str__(self):
         return str([(note, self.get_val(note)) for note in NOTES])
@@ -65,6 +91,9 @@ class PitchDistribution(object):
             return self.distribution[note]
         return 0.0
 
+    def increment_val(self, note):
+        self.set_val(note, self.get_val(note) + 1)
+
     def normalize(self):
         """
         Normalize distribution so that all entries sum to 1
@@ -74,3 +103,6 @@ class PitchDistribution(object):
             for k in self.distribution.keys():
                 val = self.get_val(k)
                 self.set_val(k, val / float(distribution_sum))
+
+
+d = PitchDistribution.from_filename('testaudio/Sex.mp3')
