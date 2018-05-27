@@ -3,8 +3,9 @@
 Tests for keyedin package
 """
 
-import pitchdistribution as pd
-import classifiers
+import sys
+sys.path.append('../keyedin')
+from keyedin import pitchdistribution as pd, classifiers
 import unittest
 
 
@@ -81,13 +82,13 @@ class TestKrumhanslSchmucklerClassifier(unittest.TestCase):
         self.assertEqual(actual, expected)
 
     def test_audio_file_in_F(self):
-        dist = pd.PitchDistribution.from_file('testaudio/RichGirl.mp3')
+        dist = pd.PitchDistribution.from_file('tests/testaudio/RichGirl.mp3')
         actual = self.krumhansl_schmuckler.get_key(dist)
         expected = pd.Key('F', 'major')
         self.assertEqual(actual, expected)
 
     def test_audio_file_in_D_minor(self):
-        dist = pd.PitchDistribution.from_file('testaudio/Sex.mp3')
+        dist = pd.PitchDistribution.from_file('tests/testaudio/Sex.mp3')
         actual = self.krumhansl_schmuckler.get_key(dist)
         expected = pd.Key('D', 'minor')
         self.assertEqual(actual, expected)
@@ -126,13 +127,13 @@ class TestNaiveBayesClassifier(unittest.TestCase):
         self.assertEqual(actual, expected)
 
     def test_audio_file_in_F(self):
-        dist = pd.PitchDistribution.from_file('testaudio/RichGirl.mp3')
+        dist = pd.PitchDistribution.from_file('tests/testaudio/RichGirl.mp3')
         actual = self.naive_bayes.get_key(dist)
         expected = pd.Key('F', 'major')
         self.assertEqual(actual, expected)
 
     def test_audio_file_in_D_minor(self):
-        dist = pd.PitchDistribution.from_file('testaudio/Sex.mp3')
+        dist = pd.PitchDistribution.from_file('tests/testaudio/Sex.mp3')
         actual = self.naive_bayes.get_key(dist)
         expected = pd.Key('D', 'minor')
         self.assertEqual(actual, expected)

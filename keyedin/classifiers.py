@@ -57,7 +57,6 @@ class KrumhanslSchmuckler(Classifier):
         dist = dist.to_array()
         correlations = {k: self.correlation(k, dist) for k in self.key_profiles}
         return max(correlations, key=correlations.get)
-        # return pd.NOTES[correlations.index(max(correlations))]
 
 
 class NaiveBayes(Classifier):
@@ -90,4 +89,3 @@ class NaiveBayes(Classifier):
         assert len(dist.distribution) == pd.NUM_NOTES, "Distribution must have %d notes, %d provided" % (pd.NUM_NOTES, len(dist.distribution))
         likelihoods = {k: self.get_key_likelihood(k, dist) for k in self.key_profiles}
         return max(likelihoods, key=likelihoods.get)
-        #return pd.NOTES[likelihoods.index(max(likelihoods))]
