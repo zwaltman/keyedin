@@ -81,40 +81,16 @@ class TestKrumhanslSchmucklerClassifier(unittest.TestCase):
         expected = pd.Key('A', 'major')
         self.assertEqual(actual, expected)
 
-    def test_audio_file_in_C(self):
-        dist = pd.PitchDistribution.from_file('tests/testaudio/If_I_Had_A_Chicken.mp3')
+    def test_audio_file_in_F(self):
+        dist = pd.PitchDistribution.from_file('tests/testaudio/RichGirl.mp3')
         actual = self.krumhansl_schmuckler.get_key(dist)
-        expected = pd.Key('C', 'major')
+        expected = pd.Key('F', 'major')
         self.assertEqual(actual, expected)
 
-    def test_audio_file_in_G_sharp(self):
-        dist = pd.PitchDistribution.from_file('tests/testaudio/Mirror_Mirror.mp3')
+    def test_audio_file_in_D_minor(self):
+        dist = pd.PitchDistribution.from_file('tests/testaudio/Sex.mp3')
         actual = self.krumhansl_schmuckler.get_key(dist)
-        expected = pd.Key('G#', 'major')
-        self.assertEqual(actual, expected)
-
-    def test_audio_file_in_G(self):
-        dist = pd.PitchDistribution.from_file('tests/testaudio/St_Francis.mp3')
-        actual = self.krumhansl_schmuckler.get_key(dist)
-        expected = pd.Key('G', 'major')
-        self.assertEqual(actual, expected)
-
-    def test_audio_file_in_A_minor(self):
-        dist = pd.PitchDistribution.from_file('tests/testaudio/Dragonfly.mp3')
-        actual = self.krumhansl_schmuckler.get_key(dist)
-        expected = pd.Key('A', 'minor')
-        self.assertEqual(actual, expected)
-
-    def test_audio_file_in_D_sharp_minor(self):
-        dist = pd.PitchDistribution.from_file('tests/testaudio/Tibet.mp3')
-        actual = self.krumhansl_schmuckler.get_key(dist)
-        expected = pd.Key('D#', 'minor')
-        self.assertEqual(actual, expected)
-
-    def test_audio_file_in_G_minor(self):
-        dist = pd.PitchDistribution.from_file('tests/testaudio/Butchers.mp3')
-        actual = self.krumhansl_schmuckler.get_key(dist)
-        expected = pd.Key('G', 'minor')
+        expected = pd.Key('D', 'minor')
         self.assertEqual(actual, expected)
 
 
@@ -150,40 +126,16 @@ class TestNaiveBayesClassifier(unittest.TestCase):
         expected = pd.Key('A', 'major')
         self.assertEqual(actual, expected)
 
-    def test_audio_file_in_C(self):
-        dist = pd.PitchDistribution.from_file('tests/testaudio/If_I_Had_A_Chicken.mp3')
+    def test_audio_file_in_F(self):
+        dist = pd.PitchDistribution.from_file('tests/testaudio/RichGirl.mp3')
         actual = self.naive_bayes.get_key(dist)
-        expected = pd.Key('C', 'major')
+        expected = pd.Key('F', 'major')
         self.assertEqual(actual, expected)
 
-    def test_audio_file_in_G_sharp(self):
-        dist = pd.PitchDistribution.from_file('tests/testaudio/Mirror_Mirror.mp3')
+    def test_audio_file_in_D_minor(self):
+        dist = pd.PitchDistribution.from_file('tests/testaudio/Sex.mp3')
         actual = self.naive_bayes.get_key(dist)
-        expected = pd.Key('G#', 'major')
-        self.assertEqual(actual, expected)
-
-    def test_audio_file_in_G(self):
-        dist = pd.PitchDistribution.from_file('tests/testaudio/St_Francis.mp3')
-        actual = self.naive_bayes.get_key(dist)
-        expected = pd.Key('G', 'major')
-        self.assertEqual(actual, expected)
-
-    def test_audio_file_in_A_minor(self):
-        dist = pd.PitchDistribution.from_file('tests/testaudio/Dragonfly.mp3')
-        actual = self.naive_bayes.get_key(dist)
-        expected = pd.Key('A', 'minor')
-        self.assertEqual(actual, expected)
-
-    def test_audio_file_in_D_sharp_minor(self):
-        dist = pd.PitchDistribution.from_file('tests/testaudio/Tibet.mp3')
-        actual = self.naive_bayes.get_key(dist)
-        expected = pd.Key('D#', 'minor')
-        self.assertEqual(actual, expected)
-
-    def test_audio_file_in_G_minor(self):
-        dist = pd.PitchDistribution.from_file('tests/testaudio/Butchers.mp3')
-        actual = self.naive_bayes.get_key(dist)
-        expected = pd.Key('G', 'minor')
+        expected = pd.Key('D', 'minor')
         self.assertEqual(actual, expected)
 
 
