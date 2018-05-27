@@ -1,0 +1,12 @@
+## COPYRIGHT INFO FOR AUDIO FILES ##
+
+All audio files used for testing were obtained through YouTube's audio library [https://www.youtube.com/audiolibrary/music]
+and are free to use through a Creative Commons license.
+
+CREDITS:
+Butchers.mp3: 'Butchers', Silent Partner
+Campfire_Song.mp3: 'Campfire Song', Chris Haugen
+Dragonfly.mp3: 'Dragonfly', Quincas Moreira
+Morning_Mandolin.mp3: 'Morning Mandolin', Chis Haugen
+St_Francis.mp3: 'St. Francis', Josh Lippi & The Overtimers
+Tibet.mp3: 'Tibet', NOVATOFF
