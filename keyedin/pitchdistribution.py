@@ -135,6 +135,6 @@ class PitchDistribution(object):
         """
         distribution_sum = sum(self.distribution.values())
         if distribution_sum != 0:
-            for k in self.distribution.keys():
-                val = self.get_val(k)
-                self.set_val(k, val / float(distribution_sum))
+            for note in NOTES:
+                val = self.get_val(note)
+                self.set_val(note, val / float(distribution_sum))
