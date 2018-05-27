@@ -30,7 +30,7 @@ krumhansl_schmuckler = classifiers.KrumhanslSchmuckler()
 dist = pd.PitchDistribution.from_file('path/to/SongInBMinor.mp3')
 krumhansl_schmuckler.get_key(dist) # Returns Key object Key('B', 'minor')
 
-# After key identification, tonal center and scale of keys are available through Key.get_tonic() and Key.get_scale
+# After key identification, tonal center and scale of keys are available through Key.get_tonic() and Key.get_scale()
 k = pd.Key('F', 'major')
 k.get_tonic() # Returns string 'F'
 k.get_scale() # Returns string 'major'
