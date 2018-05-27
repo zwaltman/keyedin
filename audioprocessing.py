@@ -4,12 +4,11 @@ Tools for processing audio data
 """
 
 import librosa
-import librosa.display
 
 
-def chromagram_from_filename(filename):
+def chromagram_from_file(filename):
     """
-    Takes path FILENAME to audio file and returns the file's chromagram C (numpy array with shape=(12, t=num_time_samples))
+    Takes path FILENAME to audio file and returns the file's chromagram C (numpy array with shape=(12, t=number time samples))
     """
     y, sr = librosa.load(filename)
     # Separate harmonic component from percussive

@@ -7,13 +7,14 @@ import audioprocessing as ap
 import numpy as np
 
 
+NUM_NOTES = 12
 NOTES = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#']
 INTERVALS = ['P1', 'm2', 'M2', 'm3', 'M3', 'P4', 'd5', 'P5', 'm6', 'M6', 'm7', 'M7']
-NUM_NOTES = 12
-# 'Prototypical' pitch distributions [A, A#, B, ..., G#] for major, minor keys with tonic A,
+SCALES = ['major', 'minor']
+# 'Typical' pitch distributions [A, A#, B, ..., G#] for major, minor scales with tonic A,
 # adapted for use with other tonal centers by rotating.
-MAJOR_KEY_PROFILE = [0.16, 0.03, 0.09, 0.03, 0.13, 0.10, 0.06, 0.14, 0.03, 0.11, 0.03, 0.09]
-NATURAL_MINOR_KEY_PROFILE = [0.16, 0.03, 0.09, 0.13, 0.03, 0.10, 0.06, 0.14, 0.11, 0.03, 0.09, 0.03]
+MAJOR_SCALE_PROFILE = [0.16, 0.03, 0.09, 0.03, 0.13, 0.10, 0.06, 0.14, 0.03, 0.11, 0.03, 0.09]
+MINOR_SCALE_PROFILE = [0.16, 0.03, 0.09, 0.13, 0.03, 0.10, 0.06, 0.14, 0.11, 0.03, 0.09, 0.03]
 
 
 def skip_interval(root, interval):
@@ -27,17 +28,46 @@ def skip_interval(root, interval):
     return NOTES[(starting_position + distance) % NUM_NOTES]
 
 
-def get_key_profile(tonic):
+class Key(object):
     """
-    Returns typical pitch distribution for major key centered at given tonic.
+    Key centered at tonal center TONIC with scale SCALE
     """
-    assert tonic in NOTES, "Invalid note"
-    key_profile = PitchDistribution()
-    for i in range(NUM_NOTES):
-        current_note = skip_interval(tonic, INTERVALS[i])
-        val = MAJOR_KEY_PROFILE[i]
-        key_profile.set_val(current_note, val)
-    return key_profile
+    scale_profiles = {'major': MAJOR_SCALE_PROFILE, 'minor': MINOR_SCALE_PROFILE}
+
+    def __init__(self, tonic, scale):
+        assert tonic in NOTES, "Tonal center of key must belong to NOTES"
+        assert scale in SCALES, "Scale for key must belong to SCALES"
+        self.tonic = tonic
+        self.scale = scale
+
+    def __str__(self):
+        return ' '.join((self.tonic, self.scale))
+
+    def __repr__(self):
+        return ''.join(("Key('", self.tonic, "', '", self.scale, "')"))
+
+    def __eq__(self, other):
+        if type(other) != Key:
+            return False
+        return self.tonic == other.tonic and self.scale == other.scale
+
+    def get_tonic(self):
+        return self.tonic
+
+    def get_scale(self):
+        return self.scale
+
+    def get_key_profile(self):
+        """
+        Return typical PitchDistribution for Key
+        """
+        scale_profile = Key.scale_profiles[self.scale]
+        key_profile = PitchDistribution()
+        for i in range(NUM_NOTES):
+            current_note = skip_interval(self.tonic, INTERVALS[i])
+            val = scale_profile[i]
+            key_profile.set_val(current_note, val)
+        return key_profile
 
 
 class PitchDistribution(object):
@@ -58,7 +88,7 @@ class PitchDistribution(object):
             self.normalize()
 
     @classmethod
-    def from_filename(cls, filename):
+    def from_file(cls, filename):
         """
         Given path FILENAME to audio file, return its PitchDistribution
         """
@@ -68,9 +98,11 @@ class PitchDistribution(object):
             """
             return skip_interval('C', INTERVALS[i])
 
-        C = ap.chromagram_from_filename(filename)
-        dist = PitchDistribution()
+        C = ap.chromagram_from_file(filename)
+        # Pick out only most prominent note in each time interval
         single_note_reduction = C.argmax(axis=0)
+
+        dist = PitchDistribution()
         for i in np.nditer(single_note_reduction):
             note = chromagram_index_to_note(i)
             dist.increment_val(note)
@@ -92,6 +124,9 @@ class PitchDistribution(object):
         return 0.0
 
     def increment_val(self, note):
+        """
+        Increments value of note NOTE in a distribution
+        """
         self.set_val(note, self.get_val(note) + 1)
 
     def normalize(self):
@@ -103,6 +138,3 @@ class PitchDistribution(object):
             for k in self.distribution.keys():
                 val = self.get_val(k)
                 self.set_val(k, val / float(distribution_sum))
-
-
-d = PitchDistribution.from_filename('testaudio/Sex.mp3')

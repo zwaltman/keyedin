@@ -21,8 +21,10 @@ class Classifier(object):
         Return dictionary of typical pitch class distribution for all keys
         """
         profiles = {}
-        for key in pd.NOTES:
-            profiles[key] = pd.get_key_profile(key)
+        for tonic in pd.NOTES:
+            for scale in pd.SCALES:
+                key = pd.Key(tonic, scale)
+                profiles[key] = key.get_key_profile()
         return profiles
 
     def get_key(self, dist):
@@ -53,8 +55,9 @@ class KrumhanslSchmuckler(Classifier):
         """
         assert len(dist.distribution) == pd.NUM_NOTES, "Distribution must have %d notes, %d provided" % (pd.NUM_NOTES, len(dist.distribution))
         dist = dist.to_array()
-        correlations = [self.correlation(key, dist) for key in pd.NOTES]
-        return pd.NOTES[correlations.index(max(correlations))]
+        correlations = {k: self.correlation(k, dist) for k in self.key_profiles}
+        return max(correlations, key=correlations.get)
+        # return pd.NOTES[correlations.index(max(correlations))]
 
 
 class NaiveBayes(Classifier):
@@ -85,5 +88,6 @@ class NaiveBayes(Classifier):
         Given PitchDistribution DIST, return the key which is most likely given Naive Bayes model
         """
         assert len(dist.distribution) == pd.NUM_NOTES, "Distribution must have %d notes, %d provided" % (pd.NUM_NOTES, len(dist.distribution))
-        likelihoods = [self.get_key_likelihood(key, dist) for key in pd.NOTES]
-        return pd.NOTES[likelihoods.index(max(likelihoods))]
+        likelihoods = {k: self.get_key_likelihood(k, dist) for k in self.key_profiles}
+        return max(likelihoods, key=likelihoods.get)
+        #return pd.NOTES[likelihoods.index(max(likelihoods))]

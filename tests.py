@@ -21,12 +21,12 @@ class TestPitchDistribution(unittest.TestCase):
         self.assertEqual(actual, expected)
 
     def test_get_key_profile_sanity_check(self):
-        actual = pd.get_key_profile('A').to_array()
-        expected = pd.MAJOR_KEY_PROFILE
+        actual = pd.Key('A', 'major').get_key_profile().to_array()
+        expected = pd.MAJOR_SCALE_PROFILE
         self.assertEqual(actual, expected)
 
     def test_get_key_profile_with_loop(self):
-        actual = pd.get_key_profile('F').to_array()
+        actual = pd.Key('F', 'major').get_key_profile().to_array()
         expected = [0.13, 0.10, 0.06, 0.14, 0.03, 0.11, 0.03, 0.09, 0.16, 0.03, 0.09, 0.03]
         self.assertEqual(actual, expected)
 
@@ -55,7 +55,7 @@ class TestKrumhanslSchmucklerClassifier(unittest.TestCase):
     def test_monotonic_distribution(self):
         values = [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]
         dist = pd.PitchDistribution(values)
-        actual = self.krumhansl_schmuckler.get_key(dist)
+        actual = self.krumhansl_schmuckler.get_key(dist).get_tonic()
         expected = 'E'
         self.assertEqual(actual, expected)
 
@@ -63,27 +63,33 @@ class TestKrumhanslSchmucklerClassifier(unittest.TestCase):
         values = [0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0]
         dist = pd.PitchDistribution(values)
         actual = self.krumhansl_schmuckler.get_key(dist)
-        expected = 'C'
+        expected = pd.Key('C', 'major')
         self.assertEqual(actual, expected)
 
     def test_leading_tone(self):
         values = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3]
         dist = pd.PitchDistribution(values)
         actual = self.krumhansl_schmuckler.get_key(dist)
-        expected = 'G#'
+        expected = pd.Key('G#', 'major')
         self.assertEqual(actual, expected)
 
     def test_add_4_triad(self):
         values = [2, 0, 0, 0, 3, 2, 0, 2, 0, 0, 0, 0]
         dist = pd.PitchDistribution(values)
         actual = self.krumhansl_schmuckler.get_key(dist)
-        expected = 'A'
+        expected = pd.Key('A', 'major')
         self.assertEqual(actual, expected)
 
     def test_audio_file_in_F(self):
-        dist = pd.PitchDistribution.from_filename('testaudio/RichGirl.mp3')
+        dist = pd.PitchDistribution.from_file('testaudio/RichGirl.mp3')
         actual = self.krumhansl_schmuckler.get_key(dist)
-        expected = 'F'
+        expected = pd.Key('F', 'major')
+        self.assertEqual(actual, expected)
+
+    def test_audio_file_in_D_minor(self):
+        dist = pd.PitchDistribution.from_file('testaudio/Sex.mp3')
+        actual = self.krumhansl_schmuckler.get_key(dist)
+        expected = pd.Key('D', 'minor')
         self.assertEqual(actual, expected)
 
 
@@ -94,7 +100,7 @@ class TestNaiveBayesClassifier(unittest.TestCase):
     def test_monotonic_distribution(self):
         values = [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]
         dist = pd.PitchDistribution(values)
-        actual = self.naive_bayes.get_key(dist)
+        actual = self.naive_bayes.get_key(dist).get_tonic()
         expected = 'E'
         self.assertEqual(actual, expected)
 
@@ -102,29 +108,34 @@ class TestNaiveBayesClassifier(unittest.TestCase):
         values = [0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0]
         dist = pd.PitchDistribution(values)
         actual = self.naive_bayes.get_key(dist)
-        expected = 'C'
+        expected = pd.Key('C', 'major')
         self.assertEqual(actual, expected)
 
     def test_leading_tone(self):
         values = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3]
         dist = pd.PitchDistribution(values)
         actual = self.naive_bayes.get_key(dist)
-        expected = 'G#'
+        expected = pd.Key('G#', 'major')
         self.assertEqual(actual, expected)
 
     def test_add_4_triad(self):
         values = [2, 0, 0, 0, 3, 2, 0, 2, 0, 0, 0, 0]
         dist = pd.PitchDistribution(values)
         actual = self.naive_bayes.get_key(dist)
-        expected = 'A'
+        expected = pd.Key('A', 'major')
         self.assertEqual(actual, expected)
 
     def test_audio_file_in_F(self):
-        dist = pd.PitchDistribution.from_filename('testaudio/RichGirl.mp3')
+        dist = pd.PitchDistribution.from_file('testaudio/RichGirl.mp3')
         actual = self.naive_bayes.get_key(dist)
-        expected = 'F'
+        expected = pd.Key('F', 'major')
         self.assertEqual(actual, expected)
 
+    def test_audio_file_in_D_minor(self):
+        dist = pd.PitchDistribution.from_file('testaudio/Sex.mp3')
+        actual = self.naive_bayes.get_key(dist)
+        expected = pd.Key('D', 'minor')
+        self.assertEqual(actual, expected)
 
 
 if __name__ == '__main__':
